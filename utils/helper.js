@@ -1,9 +1,17 @@
-import {Notifications} from 'expo'
+import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ASYNC_STORAGE_KEY = 'my-udacity-nd-mob-flash-storage'
 const ASYNC_NOTIFICATION_KEY = 'my-udacity-nd-mob-flash-storage:notifications'
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export async function getDecks() {
     try {
@@ -65,38 +73,31 @@ export async function addCardToDeck(title, card) {
 function createNotification() {
     return {
         title: 'Take a quiz',
-        body: "Don't miss out on taking a flash quiz!",
-        ios: {
-            sound: true
-        },
-        android: {
-            sound: true,
-            priority: 'high',
-            sticky: false,
-            vibrate: true
-        }
+        body: "Don't miss out on taking a flash quiz!"
     }
 }
 
 export async function setLocalNotification() {
     const data = await AsyncStorage.getItem(ASYNC_NOTIFICATION_KEY).then(JSON.parse)
-    if (!data) {
-        const status = Permissions.askAsync(Permissions.NOTIFICATIONS)
+    if (data === null) {
+        const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS)
         if (status === 'granted') {
-            Notifications.cancelAllScheduledNotificationsAsync()
+            await Notifications.cancelAllScheduledNotificationsAsync()
             
             let tomorrow = new Date()
             tomorrow.setDate(tomorrow.getDate() + 1)
             tomorrow.setHours(21)
             tomorrow.setMinutes(0)
+            tomorrow.setSeconds(0)
+            tomorrow.setMilliseconds(0)
 
-            Notifications.scheduleLocalNotificationAsync(
-                createNotification(),
-                {
-                    time: tomorrow,
-                    repeat: 'day'
+            await Notifications.scheduleNotificationAsync({
+                content: createNotification(),
+                trigger: {
+                    seconds: Math.ceil((tomorrow - (new Date())) / 1000),
+                    repeats: true
                 }
-            )
+            })
 
             AsyncStorage.setItem(ASYNC_NOTIFICATION_KEY, JSON.stringify({set: true}))
         }

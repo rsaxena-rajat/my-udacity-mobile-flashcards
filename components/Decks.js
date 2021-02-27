@@ -38,7 +38,7 @@ function DeckList({navigation}) {
         let isCancelled = false
         if (!isCancelled) {
             getDecks()
-            .then((decks) => setDecks(Object.keys(decks).map((key) => decks[key])))
+            .then((decks) => !isCancelled && setDecks(Object.keys(decks).map((key) => decks[key])))
         }
         return () => {
             isCancelled = true
