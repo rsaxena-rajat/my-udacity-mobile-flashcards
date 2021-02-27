@@ -117,7 +117,7 @@ export default function Quiz({navigation, parentNav, route}) {
         }
         setScore(score + 1)
         setCounter(counter + 1)
-
+        setMode(modes.QUESTION)
     }
 
     const handleIncorrect = () => {
@@ -125,6 +125,7 @@ export default function Quiz({navigation, parentNav, route}) {
             resetNotification()
         }
         setCounter(counter + 1)
+        setMode(modes.QUESTION)
     }
 
     const restartQuiz = () => {
