@@ -6,6 +6,8 @@ import {
     TouchableOpacity
 } from 'react-native'
 
+import {clearLocalNotification, setLocalNotification} from '../utils/helper'
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -104,12 +106,24 @@ export default function Quiz({navigation, parentNav, route}) {
     const [counter, setCounter] = useState(0)
     const [score, setScore] = useState(0)
 
+    const resetNotification = async () => {
+        await clearLocalNotification()
+        setLocalNotification()
+    }
+
     const handleCorrect = () => {
+        if (counter + 1 === cards.length) {
+            resetNotification()
+        }
         setScore(score + 1)
         setCounter(counter + 1)
+
     }
 
     const handleIncorrect = () => {
+        if (counter + 1 === cards.length) {
+            resetNotification()
+        }
         setCounter(counter + 1)
     }
 
